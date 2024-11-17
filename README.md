@@ -75,7 +75,7 @@ private:
 
 ### Declare a context switch class
 ```cpp
-class FooContextSwitch : public util::ContextSwitch<IFoo>
+class FooContextSwitch : public funcall::ContextSwitch<IFoo>
 {
 public:
     void foo1() override QUEUE(foo1)
