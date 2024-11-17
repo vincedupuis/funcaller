@@ -1,11 +1,18 @@
 cmake_minimum_required(VERSION 3.28)
+
 project(funcall)
 
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_FLAGS "-DSPDLOG_COMPILED_LIB -Wall -Wextra -Wpedantic -Werror")
-set(CMAKE_CXX_LINK_FLAGS "-fuse-ld=gold -L/usr/local/lib")
-set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -fno-inline -fno-elide-constructors")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+
+if (MSVC)
+    set(CMAKE_CXX_FLAGS "/EHsc /Wall /W4 /WX")
+    set(CMAKE_CXX_FLAGS_DEBUG "/Od /Zi /D_DEBUG")
+    set(CMAKE_CXX_FLAGS_RELEASE "/O2")
+else ()
+    set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wpedantic -Werror")
+    set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+endif ()
 
 find_package(spdlog REQUIRED)
 
