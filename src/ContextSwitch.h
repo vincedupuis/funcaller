@@ -6,7 +6,7 @@
 
 #define QUEUE(f, ...) { functionQueue->add([=, this] { implementation->f(__VA_ARGS__); }); }
 
-namespace util
+namespace funcall
 {
     template<typename T>
     class ContextSwitch : public T

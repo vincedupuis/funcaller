@@ -1,7 +1,7 @@
 #include "ThreadedFunctionQueue.h"
 #include <spdlog/spdlog.h>
 
-using namespace util;
+using namespace funcall;
 
 void ThreadedFunctionQueue::start()
 {

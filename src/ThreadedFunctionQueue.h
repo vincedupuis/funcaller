@@ -7,7 +7,7 @@
 #include <mutex>
 #include <condition_variable>
 
-namespace util
+namespace funcall
 {
     class ThreadedFunctionQueue final : public IFunctionQueue
     {

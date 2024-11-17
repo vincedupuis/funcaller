@@ -2,7 +2,7 @@
 
 #include <functional>
 
-namespace util
+namespace funcall
 {
     using Function = std::function<void()>;
 

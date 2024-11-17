@@ -7,7 +7,7 @@
 
 using namespace spdlog;
 
-auto MainQueue = std::make_shared<util::ThreadedFunctionQueue>();
+auto MainQueue = std::make_shared<funcall::ThreadedFunctionQueue>();
 void signalHandler(int signal);
 std::jthread mainThread;
 
