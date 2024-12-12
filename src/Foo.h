@@ -2,8 +2,6 @@
 
 #include "ContextSwitch.h"
 
-#include <spdlog/spdlog.h>
-
 class IFoo
 {
 public:
@@ -19,17 +17,17 @@ class Foo : public IFoo
 public:
     void foo1() override
     {
-        spdlog::info("Function foo1 called");
+        printf("Function foo1 called\n");
     }
 
     void foo2(int a) override
     {
-        spdlog::info("Function foo2 called with argument: {}", a);
+        printf("Function foo2 called with argument: %d\n", a);
     }
 
     void foo3(std::shared_ptr<int> ptr) override
     {
-        spdlog::info("Function foo3 called with argument: {}", *ptr);
+        printf("Function foo3 called with argument: %d\n", *ptr);
     }
 };
 

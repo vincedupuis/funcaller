@@ -109,27 +109,18 @@ public:
 Should work out of the box
 ```
 
-## Using conan
-[Install conan version 2.0.0 or higher](https://conan.io/downloads)
+## Using local environment
 ```
-conan profile new default --detect
+mkdir build
+cd build
+cmake ..
+cmake --build .
 ```
-
-### MSVC
-
-````
-conan install . --build missing --settings build_type=Debug
-cmake --preset conan-default
-cmake --build --preset conan-debug
-.\build\Debug\funcall.exe
-````
-
-### gcc
-
+Windows
+```bash
+.\Debug\funcaller.exe
 ```
-conan install . --build missing --settings "&:build_type=Debug" --settings build_type=Release
-cmake --preset conan-debug
-cmake --build --preset conan-debug
-.\build\Debug\funcall
+or Linux
+```bash
+./funcaller
 ```
-

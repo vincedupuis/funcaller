@@ -4,13 +4,15 @@
 
 namespace funcall
 {
-    using Function = std::function<void()>;
 
-    class IFunctionQueue
-    {
-    public:
-        virtual ~IFunctionQueue() = default;
+using Function = std::function<void()>;
 
-        virtual void add(Function function) = 0;
-    };
+class IFunctionQueue
+{
+public:
+    virtual ~IFunctionQueue() = default;
+
+    virtual void add(Function&& function) = 0;
+};
+
 }

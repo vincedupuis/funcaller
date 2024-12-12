@@ -1,11 +1,8 @@
 #include "ThreadedFunctionQueue.h"
 #include "Foo.h"
 
-#include <spdlog/spdlog.h>
 #include <csignal>
 #include <utility>
-
-using namespace spdlog;
 
 auto MainQueue = std::make_shared<funcall::ThreadedFunctionQueue>();
 void signalHandler(int signal);
@@ -40,15 +37,17 @@ int main()
     std::signal(SIGINT, signalHandler);
     std::signal(SIGTERM, signalHandler);
 
-    info("Starting main queue");
     MainQueue->start();
+    printf("Main queue started\n");
 
-    auto foo = std::make_shared<Foo>();
+    const auto foo = std::make_shared<Foo>();
 
     auto fooContextSwitch = std::make_shared<FooContextSwitch>();
-    fooContextSwitch->configure(MainQueue, foo);
+    fooContextSwitch->setup(foo, MainQueue);
 
-    auto bar = std::make_shared<Bar>(fooContextSwitch);
+    const auto bar = std::make_shared<Bar>(fooContextSwitch);
+
+    // these calls will be executed in the main thread
     bar->bar1();
     bar->bar2(42);
     bar->bar3(std::make_shared<int>(55));
@@ -58,17 +57,20 @@ int main()
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
     });
-    mainThread.join();
 
-    info("Stopping main queue");
+    // Wait for main thread to stop
+    mainThread.join();
+    printf("Main thread stopped\n");
+
     MainQueue->stop();
+    printf("Main queue stopped\n");
 
     return 0;
 }
 
 void signalHandler(int signal)
 {
-    info("Received signal: {}", signal);
+    printf("Received signal %d\n", signal);
     if (signal == SIGINT || signal == SIGTERM)
     {
         mainThread.request_stop();

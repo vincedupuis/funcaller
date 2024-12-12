@@ -8,20 +8,20 @@
 
 namespace funcall
 {
-    template<typename T>
-    class ContextSwitch : public T
-    {
-    public:
-        void configure(
-            std::shared_ptr<IFunctionQueue> fq,
-            std::shared_ptr<T> impl)
-        {
-            implementation = std::move(impl);
-            functionQueue = std::move(fq);
-        }
 
-    protected:
-        std::shared_ptr<T> implementation;
-        std::shared_ptr<IFunctionQueue> functionQueue;
-    };
+template<typename T>
+class ContextSwitch : public T
+{
+public:
+    void setup(std::shared_ptr<T> impl, std::shared_ptr<IFunctionQueue> fq)
+    {
+        implementation = std::move(impl);
+        functionQueue = std::move(fq);
+    }
+
+protected:
+    std::shared_ptr<T> implementation;
+    std::shared_ptr<IFunctionQueue> functionQueue;
+};
+
 }

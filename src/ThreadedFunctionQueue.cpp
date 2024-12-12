@@ -1,5 +1,4 @@
 #include "ThreadedFunctionQueue.h"
-#include <spdlog/spdlog.h>
 
 using namespace funcall;
 
@@ -24,7 +23,7 @@ void ThreadedFunctionQueue::stop()
     queue = std::queue<Function>();
 }
 
-void ThreadedFunctionQueue::add(Function function)
+void ThreadedFunctionQueue::add(Function&& function)
 {
     std::unique_lock lock(mutex);
     queue.push(std::move(function));
@@ -51,7 +50,7 @@ void ThreadedFunctionQueue::processQueue()
             function();
         }
         catch (const std::exception &e) {
-            spdlog::error("Exception caught in ThreadedFunctionQueue::processQueue: {}", e.what());
+            printf("Exception caught in ThreadedFunctionQueue::processQueue: %s\n", e.what());
         }
     }
 }
