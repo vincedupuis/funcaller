@@ -50,7 +50,7 @@ void ThreadedFunctionQueue::processQueue()
             function();
         }
         catch (const std::exception &e) {
-            printf("Exception caught in ThreadedFunctionQueue::processQueue: %s\n", e.what());
+            log(e.what());
         }
     }
 }

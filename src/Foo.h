@@ -18,6 +18,7 @@ public:
     void foo1() override
     {
         printf("Function foo1 called\n");
+        throw std::runtime_error("Exception in foo1");
     }
 
     void foo2(int a) override

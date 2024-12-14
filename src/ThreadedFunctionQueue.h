@@ -9,16 +9,18 @@
 
 namespace funcall
 {
-
-class ThreadedFunctionQueue final : public IFunctionQueue
-{
+class ThreadedFunctionQueue final : public IFunctionQueue {
 public:
+    explicit ThreadedFunctionQueue(std::function<void(std::string &&)> log)
+        : log(std::move(log)) {}
+
     void start();
     void stop();
 
     void add(Function&& function) override;
 
 private:
+    std::function<void(std::string &&)> log;
     std::queue<Function> queue;
     std::mutex mutex;
     std::condition_variable condition;
@@ -27,5 +29,4 @@ private:
 
     void processQueue();
 };
-
 }

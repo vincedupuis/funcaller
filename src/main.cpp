@@ -2,9 +2,12 @@
 #include "Foo.h"
 
 #include <csignal>
-#include <utility>
 
-auto MainQueue = std::make_shared<funcall::ThreadedFunctionQueue>();
+auto MainQueue = std::make_shared<funcall::ThreadedFunctionQueue>(
+    [] (std::string&& message) {
+    printf("%s\n", message.c_str());
+});
+
 void signalHandler(int signal);
 std::jthread mainThread;
 
