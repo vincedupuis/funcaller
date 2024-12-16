@@ -2,31 +2,50 @@
 
 #include "IFunctionQueue.h"
 
+#include <condition_variable>
+#include <mutex>
 #include <thread>
 #include <queue>
-#include <mutex>
-#include <condition_variable>
 
-namespace funcall
+namespace funcall {
+
+class ThreadedFunctionQueue final : public IFunctionQueue
 {
-class ThreadedFunctionQueue final : public IFunctionQueue {
 public:
-    explicit ThreadedFunctionQueue(std::function<void(std::string &&)> log)
-        : log(std::move(log)) {}
+    ThreadedFunctionQueue() noexcept
+        : log(nullptr)
+    {
+        start();
+    }
 
-    void start();
-    void stop();
+    explicit ThreadedFunctionQueue(void (*log)(std::string &&)) noexcept
+        : log(log)
+    {
+        start();
+    }
 
-    void add(Function&& function) override;
+    ~ThreadedFunctionQueue() override { stop(); }
+
+    void add(Function &&function) noexcept override;
+
+    ThreadedFunctionQueue(const ThreadedFunctionQueue &) = delete;
+    ThreadedFunctionQueue &operator=(const ThreadedFunctionQueue &) = delete;
+    ThreadedFunctionQueue(ThreadedFunctionQueue &&) = delete;
+    ThreadedFunctionQueue &operator=(ThreadedFunctionQueue &&) = delete;
 
 private:
-    std::function<void(std::string &&)> log;
-    std::queue<Function> queue;
-    std::mutex mutex;
-    std::condition_variable condition;
-    std::thread thread;
-    std::atomic<bool> running = false;
+    void start() noexcept;
+    void stop() noexcept;
 
-    void processQueue();
+    void (*log)(std::string &&);
+    std::thread *thread = nullptr;
+    std::mutex mutex;
+    std::queue<Function> queue;
+    std::condition_variable condition;
+    std::atomic_bool stopping = false;
+    std::atomic_bool quitting = false;
+
+    void processQueue() noexcept;
 };
-}
+
+} // namespace funcall

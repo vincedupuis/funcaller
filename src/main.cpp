@@ -3,11 +3,6 @@
 
 #include <csignal>
 
-auto MainQueue = std::make_shared<funcall::ThreadedFunctionQueue>(
-    [] (std::string&& message) {
-    printf("%s\n", message.c_str());
-});
-
 void signalHandler(int signal);
 std::jthread mainThread;
 
@@ -40,8 +35,10 @@ int main()
     std::signal(SIGINT, signalHandler);
     std::signal(SIGTERM, signalHandler);
 
-    MainQueue->start();
-    printf("Main queue started\n");
+    auto MainQueue = std::make_shared<funcall::ThreadedFunctionQueue>(
+        [] (std::string&& message) {
+        printf("%s\n", message.c_str());
+    });
 
     const auto foo = std::make_shared<Foo>();
 
@@ -64,9 +61,6 @@ int main()
     // Wait for main thread to stop
     mainThread.join();
     printf("Main thread stopped\n");
-
-    MainQueue->stop();
-    printf("Main queue stopped\n");
 
     return 0;
 }
