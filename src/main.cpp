@@ -1,4 +1,5 @@
 #include "Foo.h"
+#include "FooContextSwitch.h"
 #include "ThreadedFunctionQueue.h"
 
 #include <csignal>
@@ -27,7 +28,7 @@ int main()
     std::signal(SIGINT, signalHandler);
     std::signal(SIGTERM, signalHandler);
 
-    auto MainQueue = std::make_shared<funcall::ThreadedFunctionQueue>(
+    const auto MainQueue = std::make_shared<funcall::ThreadedFunctionQueue>(
         [](std::string &&message) { printf("%s\n", message.c_str()); });
 
     const auto foo = std::make_shared<Foo>();
