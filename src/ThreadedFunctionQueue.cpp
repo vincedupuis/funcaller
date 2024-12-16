@@ -28,6 +28,7 @@ void ThreadedFunctionQueue::stop() noexcept
 
     if (quitting) {
         thread->join();
+        delete thread;
         return;
     }
 
