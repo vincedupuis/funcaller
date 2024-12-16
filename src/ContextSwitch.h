@@ -4,10 +4,12 @@
 
 #include <memory>
 
-#define QUEUE(f, ...) { functionQueue->add([=, this] { implementation->f(__VA_ARGS__); }); }
+#define QUEUE(f, ...) \
+    { \
+        functionQueue->add([=, this] { implementation->f(__VA_ARGS__); }); \
+    }
 
-namespace funcall
-{
+namespace funcall {
 
 template<typename T>
 class ContextSwitch : public T
@@ -24,4 +26,4 @@ protected:
     std::shared_ptr<IFunctionQueue> functionQueue;
 };
 
-}
+} // namespace funcall

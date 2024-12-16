@@ -2,6 +2,8 @@
 
 #include "ContextSwitch.h"
 
+#include <stdexcept>
+
 class IFoo
 {
 public:
@@ -21,10 +23,7 @@ public:
         throw std::runtime_error("Exception in foo1");
     }
 
-    void foo2(int a) override
-    {
-        printf("Function foo2 called with argument: %d\n", a);
-    }
+    void foo2(int a) override { printf("Function foo2 called with argument: %d\n", a); }
 
     void foo3(std::shared_ptr<int> ptr) override
     {
@@ -35,7 +34,7 @@ public:
 class FooContextSwitch : public funcall::ContextSwitch<IFoo>
 {
 public:
-    void foo1() override QUEUE(foo1)
-    void foo2(int a) override QUEUE(foo2, a)
-    void foo3(std::shared_ptr<int> ptr) override QUEUE(foo3, ptr)
+    void foo1() override QUEUE(foo1);
+    void foo2(int a) override QUEUE(foo2, a);
+    void foo3(std::shared_ptr<int> ptr) override QUEUE(foo3, ptr);
 };
