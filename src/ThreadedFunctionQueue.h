@@ -2,10 +2,11 @@
 
 #include "IFunctionQueue.h"
 
+#include <atomic>
 #include <condition_variable>
 #include <mutex>
-#include <thread>
 #include <queue>
+#include <thread>
 
 namespace funcall {
 
@@ -13,18 +14,17 @@ class ThreadedFunctionQueue final : public IFunctionQueue
 {
 public:
     ThreadedFunctionQueue() noexcept
-        : log(nullptr)
-    {
-        start();
-    }
+        : mLogger(nullptr)
+    {}
 
     explicit ThreadedFunctionQueue(void (*log)(std::string &&)) noexcept
-        : log(log)
-    {
-        start();
-    }
+        : mLogger(log)
+    {}
 
-    ~ThreadedFunctionQueue() override { stop(); }
+    ~ThreadedFunctionQueue() noexcept override { stop(); }
+
+    std::thread::id start() noexcept;
+    bool stop() noexcept;
 
     void add(Function &&function) noexcept override;
 
@@ -34,18 +34,26 @@ public:
     ThreadedFunctionQueue &operator=(ThreadedFunctionQueue &&) = delete;
 
 private:
-    void start() noexcept;
-    void stop() noexcept;
+    std::function<void(std::string &&)> mLogger;
 
-    void (*log)(std::string &&);
-    std::thread *thread = nullptr;
-    std::mutex mutex;
-    std::queue<Function> queue;
-    std::condition_variable condition;
-    std::atomic_bool stopping = false;
-    std::atomic_bool quitting = false;
+    struct Context
+    {
+        std::thread thread;
+        std::mutex mutex;
+        std::queue<Function> queue;
+        std::condition_variable condition;
+        std::atomic_bool running = false;
+        std::atomic_bool stopping = false;
+    };
 
-    void processQueue() noexcept;
+    std::mutex mMutex;
+    std::atomic<std::shared_ptr<Context>> mContext;
+
+    static void waitFor(const std::atomic_bool &var, bool value) noexcept;
+
+    static void processQueue(
+        std::shared_ptr<Context> context,
+        std::function<void(std::string &&)> _logger) noexcept;
 };
 
 } // namespace funcall
