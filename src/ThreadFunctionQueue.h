@@ -6,26 +6,26 @@
 #include <condition_variable>
 #include <functional>
 #include <mutex>
-#include <thread>
 #include <queue>
+#include <thread>
 
 namespace funcall {
 
 // A thread-safe object that queues and execute functions in a separate thread.
-class ThreadedFunctionQueue final : public IFunctionQueue
+class ThreadFunctionQueue final : public IFunctionQueue
 {
 public:
-    ThreadedFunctionQueue() noexcept
+    ThreadFunctionQueue() noexcept
         : mLogger(nullptr)
     {}
 
     // Constructor with a static logger function
-    explicit ThreadedFunctionQueue(void (*log)(std::string &&)) noexcept
+    explicit ThreadFunctionQueue(void (*log)(std::string &&)) noexcept
         : mLogger(log)
     {}
 
     // Destructor, will stop the thread if running
-    ~ThreadedFunctionQueue() noexcept override { stop(); }
+    ~ThreadFunctionQueue() noexcept override { stop(); }
 
     // Start the thread and return the thread id,
     // or return an empty id if the thread is already running
@@ -40,10 +40,10 @@ public:
     void add(Function &&function) noexcept override;
 
     // Copy and move constructors and assignment operators are not allowed
-    ThreadedFunctionQueue(const ThreadedFunctionQueue &) = delete;
-    ThreadedFunctionQueue &operator=(const ThreadedFunctionQueue &) = delete;
-    ThreadedFunctionQueue(ThreadedFunctionQueue &&) = delete;
-    ThreadedFunctionQueue &operator=(ThreadedFunctionQueue &&) = delete;
+    ThreadFunctionQueue(const ThreadFunctionQueue &) = delete;
+    ThreadFunctionQueue &operator=(const ThreadFunctionQueue &) = delete;
+    ThreadFunctionQueue(ThreadFunctionQueue &&) = delete;
+    ThreadFunctionQueue &operator=(ThreadFunctionQueue &&) = delete;
 
 private:
     std::function<void(std::string &&)> mLogger;

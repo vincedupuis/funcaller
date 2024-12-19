@@ -1,8 +1,8 @@
-#include "ThreadedFunctionQueue.h"
+#include "ThreadFunctionQueue.h"
 
 using namespace funcall;
 
-std::thread::id ThreadedFunctionQueue::start() noexcept
+std::thread::id ThreadFunctionQueue::start() noexcept
 {
     // Prevent multiple threads from starting/stopping the queue at the same time
     std::scoped_lock lock(mMutex);
@@ -15,7 +15,7 @@ std::thread::id ThreadedFunctionQueue::start() noexcept
 
     // Create a new context and start the thread
     ctx = std::make_shared<Context>();
-    ctx->thread = std::thread(&ThreadedFunctionQueue::processQueue, ctx, mLogger);
+    ctx->thread = std::thread(&ThreadFunctionQueue::processQueue, ctx, mLogger);
 
     // Wait for the thread to start.
     // If it starts, store the context and return the thread ID
@@ -40,7 +40,7 @@ std::thread::id ThreadedFunctionQueue::start() noexcept
     return {};
 }
 
-bool ThreadedFunctionQueue::stop() noexcept
+bool ThreadFunctionQueue::stop() noexcept
 {
     // Prevent multiple threads from starting/stopping the queue at the same time
     std::scoped_lock lock(mMutex);
@@ -78,7 +78,7 @@ bool ThreadedFunctionQueue::stop() noexcept
     return false;
 }
 
-void ThreadedFunctionQueue::add(Function &&function) noexcept
+void ThreadFunctionQueue::add(Function &&function) noexcept
 {
     // Note: if the stop occurred during this call, the last
     // context will be deleted at the end of this function
@@ -95,7 +95,7 @@ void ThreadedFunctionQueue::add(Function &&function) noexcept
     ctx->condition.notify_one();
 }
 
-void ThreadedFunctionQueue::waitFor(const std::atomic_bool &var, const bool value) noexcept
+void ThreadFunctionQueue::waitFor(const std::atomic_bool &var, const bool value) noexcept
 {
     // Wait for the variable to reach the desired value before timeout
     const auto start = std::chrono::system_clock::now();
@@ -106,7 +106,7 @@ void ThreadedFunctionQueue::waitFor(const std::atomic_bool &var, const bool valu
     }
 }
 
-void ThreadedFunctionQueue::processQueue(
+void ThreadFunctionQueue::processQueue(
     std::shared_ptr<Context> context,
     std::function<void(std::string &&)> _logger) noexcept
 {

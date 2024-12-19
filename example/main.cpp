@@ -1,26 +1,12 @@
+#include "Bar.h"
 #include "Foo.h"
 #include "FooContextSwitch.h"
-#include "ThreadedFunctionQueue.h"
+#include "ThreadFunctionQueue.h"
 
 #include <csignal>
 
 void signalHandler(int signal);
 std::jthread mainThread;
-
-class Bar
-{
-public:
-    explicit Bar(std::shared_ptr<IFoo> foo)
-        : foo(std::move(foo))
-    {}
-
-    void bar1() const { foo->foo1(); }
-    void bar2(const int a) const { foo->foo2(a); }
-    void bar3(std::shared_ptr<int> ptr) const { foo->foo3(std::move(ptr)); }
-
-private:
-    std::shared_ptr<IFoo> foo;
-};
 
 int main()
 {
@@ -28,7 +14,7 @@ int main()
     std::signal(SIGINT, signalHandler);
     std::signal(SIGTERM, signalHandler);
 
-    const auto MainQueue = std::make_shared<funcall::ThreadedFunctionQueue>(
+    const auto MainQueue = std::make_shared<funcall::ThreadFunctionQueue>(
         [](std::string &&message) { printf("%s\n", message.c_str()); });
     MainQueue->start();
 

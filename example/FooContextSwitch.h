@@ -3,7 +3,7 @@
 #include "ContextSwitch.h"
 #include "IFoo.h"
 
-class FooContextSwitch : public funcall::ContextSwitch<IFoo>
+class FooContextSwitch final : public funcall::ContextSwitch<IFoo>
 {
 public:
     void foo1() override QUEUE(foo1);

@@ -8,7 +8,7 @@
             "name": "Debug",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceRoot}/build/logger",
+            "program": "${workspaceRoot}/build/funcaller",
             "args": [],
             "stopAtEntry": true,
             "cwd": "${workspaceRoot}/build",
