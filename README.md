@@ -1,4 +1,4 @@
-# Function caller (funcall)
+# Function caller (funcaller)
 
 Funcaller is a lightweight C++ source code designed to simplify thread context switching through your own interfaces. It enables safe and flexible function invocation while automatically managing thread context transitions, making it ideal for multithreaded applications, plugin architectures, and event-driven systems. With Funcaller, you can easily dispatch functions, methods, and functors across different threads with type safety and minimal overhead.
 
