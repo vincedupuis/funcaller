@@ -1,8 +1,19 @@
 #include "ThreadFunctionQueue.h"
+#include <sstream>
 
 using namespace funcall;
 
-std::thread::id ThreadFunctionQueue::start() noexcept
+// Convert a thread ID to a long value
+static long toLong(const std::thread::id id) noexcept
+{
+    std::stringstream ss;
+    ss << id;
+    long value;
+    ss >> value;
+    return ss.fail() ? 0 : value;
+}
+
+long ThreadFunctionQueue::start() noexcept
 {
     // Prevent multiple threads from starting/stopping the queue at the same time
     std::scoped_lock lock(mMutex);
@@ -11,21 +22,19 @@ std::thread::id ThreadFunctionQueue::start() noexcept
     // Return the thread ID (already started)
     auto ctx = mContext.load();
     if (ctx)
-        return ctx->thread.get_id();
+        return toLong(ctx->thread.get_id());
 
-    // Create a new context and start the thread
-    ctx = std::make_shared<Context>();
+    ctx = std::make_shared<ThreadContext>();
     ctx->thread = std::thread(&ThreadFunctionQueue::processQueue, ctx, mLogger);
 
-    // Wait for the thread to start.
-    // If it starts, store the context and return the thread ID
     waitFor(ctx->running, true);
     if (ctx->running) {
         mContext.store(ctx);
-        return ctx->thread.get_id();
+        return toLong(ctx->thread.get_id());
     }
 
     // If the thread did not start, signal stopping and try to detach it
+
     ctx->stopping.store(true);
     ctx->condition.notify_one();
     try {
@@ -36,7 +45,6 @@ std::thread::id ThreadFunctionQueue::start() noexcept
             mLogger(e.what());
     }
 
-    // Return an empty thread ID
     return {};
 }
 
@@ -51,13 +59,10 @@ bool ThreadFunctionQueue::stop() noexcept
     if (!ctx)
         return true;
 
-    // Signal stopping and wait for the thread to stop
     ctx->stopping.store(true);
     ctx->condition.notify_one();
-    waitFor(ctx->running, false);
 
-    // If the thread stopped, join it and clear the context
-    // Return true (stopped)
+    waitFor(ctx->running, false);
     if (!ctx->running) {
         ctx->thread.join();
         mContext.store(nullptr);
@@ -65,6 +70,7 @@ bool ThreadFunctionQueue::stop() noexcept
     }
 
     // The thread did not stop, try to detach it
+
     try {
         ctx->thread.detach();
     }
@@ -73,7 +79,6 @@ bool ThreadFunctionQueue::stop() noexcept
             mLogger(e.what());
     }
 
-    // Clear the context and return false (not stopped)
     mContext.store(nullptr);
     return false;
 }
@@ -88,7 +93,6 @@ void ThreadFunctionQueue::add(Function &&function) noexcept
     if (!ctx)
         return;
 
-    // Add the function to the queue and notify the thread
     std::unique_lock lock(ctx->mutex);
     ctx->queue.push(std::move(function));
     lock.unlock();
@@ -97,7 +101,6 @@ void ThreadFunctionQueue::add(Function &&function) noexcept
 
 void ThreadFunctionQueue::waitFor(const std::atomic_bool &var, const bool value) noexcept
 {
-    // Wait for the variable to reach the desired value before timeout
     const auto start = std::chrono::system_clock::now();
     while (var != value) {
         if (std::chrono::system_clock::now() - start > std::chrono::seconds(5))
@@ -107,28 +110,23 @@ void ThreadFunctionQueue::waitFor(const std::atomic_bool &var, const bool value)
 }
 
 void ThreadFunctionQueue::processQueue(
-    std::shared_ptr<Context> context,
+    std::shared_ptr<ThreadContext> context,
     std::function<void(std::string &&)> _logger) noexcept
 {
-    // Move the context and logger to the local variables
     const auto ctx = std::move(context);
     const auto logger = std::move(_logger);
 
-    // Acquire the lock and notify the thread is running
     std::unique_lock lock(ctx->mutex);
     ctx->running.store(true);
 
-    // Process the queue until stopping is signaled
     while (!ctx->stopping) {
-        // Wait for the queue to have elements or stopping to be signaled
+        // Wait for the queue to have elements or stopping have been signaled
         ctx->condition.wait(lock, [&] {
             return ctx->stopping || !ctx->queue.empty();
         });
 
-        // Empty the queue and execute the functions while the thread is not stopping
         while (!ctx->stopping && !ctx->queue.empty())
         {
-            // Get the function from the queue
             auto function = std::move(ctx->queue.front());
             ctx->queue.pop();
 
@@ -145,6 +143,5 @@ void ThreadFunctionQueue::processQueue(
         }
     }
 
-    // Notify the thread is not running
     ctx->running.store(false);
 }

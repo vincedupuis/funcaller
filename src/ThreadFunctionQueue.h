@@ -1,13 +1,13 @@
 #pragma once
 
 #include "IFunctionQueue.h"
+#include "ThreadContext.h"
 
 #include <atomic>
-#include <condition_variable>
 #include <functional>
+#include <memory>
 #include <mutex>
-#include <queue>
-#include <thread>
+#include <string>
 
 namespace funcall {
 
@@ -30,7 +30,7 @@ public:
     // Start the thread and return the thread id,
     // or return an empty id if the thread is already running
     // or if the thread could not be started
-    std::thread::id start() noexcept;
+    long start() noexcept;
 
     // Stop the thread and return true if the thread is stopped,
     // or return false if the thread is not running or could not be stopped
@@ -46,31 +46,21 @@ public:
     ThreadFunctionQueue &operator=(ThreadFunctionQueue &&) = delete;
 
 private:
+    // Saved logger function
     std::function<void(std::string &&)> mLogger;
-
-    // Define the context needed for the thread
-    struct Context
-    {
-        std::thread thread;
-        std::mutex mutex;
-        std::queue<Function> queue;
-        std::condition_variable condition;
-        std::atomic_bool running = false;
-        std::atomic_bool stopping = false;
-    };
 
     // Mutex to protect the start and stop functions
     std::mutex mMutex;
 
     // Atomic shared pointer to the current thread context
-    std::atomic<std::shared_ptr<Context>> mContext;
+    std::atomic<std::shared_ptr<ThreadContext>> mContext;
 
     // Wait for the variable to reach the desired value before timeout
     static void waitFor(const std::atomic_bool &var, bool value) noexcept;
 
     // Entry point for the thread to process the queue
     static void processQueue(
-        std::shared_ptr<Context> context, std::function<void(std::string &&)> _logger) noexcept;
+        std::shared_ptr<ThreadContext> context, std::function<void(std::string &&)> _logger) noexcept;
 };
 
 } // namespace funcall
