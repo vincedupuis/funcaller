@@ -45,7 +45,7 @@ long ThreadFunctionQueue::start() noexcept
             mLogger(e.what());
     }
 
-    return {};
+    return toLong(std::thread::id());
 }
 
 bool ThreadFunctionQueue::stop() noexcept
@@ -99,7 +99,7 @@ void ThreadFunctionQueue::add(Function &&function) noexcept
     ctx->condition.notify_one();
 }
 
-void ThreadFunctionQueue::waitFor(const std::atomic_bool &var, const bool value) noexcept
+void ThreadFunctionQueue::waitFor(const std::atomic<bool> &var, const bool value) noexcept
 {
     const auto start = std::chrono::system_clock::now();
     while (var != value) {

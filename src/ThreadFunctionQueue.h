@@ -12,12 +12,10 @@
 namespace funcall {
 
 // A thread-safe object that queues and execute functions in a separate thread.
-class ThreadFunctionQueue final : public IFunctionQueue
+class ThreadFunctionQueue : public IFunctionQueue
 {
 public:
-    ThreadFunctionQueue() noexcept
-        : mLogger(nullptr)
-    {}
+    ThreadFunctionQueue() noexcept = default;
 
     // Constructor with a static logger function
     explicit ThreadFunctionQueue(void (*log)(std::string &&)) noexcept
@@ -47,20 +45,19 @@ public:
 
 private:
     // Saved logger function
-    std::function<void(std::string &&)> mLogger;
+    std::function<void(std::string &&)> mLogger = nullptr;
 
     // Mutex to protect the start and stop functions
     std::mutex mMutex;
 
     // Atomic shared pointer to the current thread context
-    std::atomic<std::shared_ptr<ThreadContext>> mContext;
+    std::atomic<std::shared_ptr<ThreadContext>> mContext = nullptr;
 
     // Wait for the variable to reach the desired value before timeout
-    static void waitFor(const std::atomic_bool &var, bool value) noexcept;
+    static void waitFor(const std::atomic<bool> &var, bool value) noexcept;
 
     // Entry point for the thread to process the queue
-    static void processQueue(
-        std::shared_ptr<ThreadContext> context, std::function<void(std::string &&)> _logger) noexcept;
+    static void processQueue(std::shared_ptr<ThreadContext> context, std::function<void(std::string &&)> _logger) noexcept;
 };
 
 } // namespace funcall
