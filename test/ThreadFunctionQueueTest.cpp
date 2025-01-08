@@ -2,7 +2,7 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <doctest/doctest.h>
 
-TEST_CASE("When_starting_Then_return_thread_id")
+TEST_CASE("When starting Then return thread id")
 {
     funcall::ThreadFunctionQueue queue;
 
@@ -10,7 +10,7 @@ TEST_CASE("When_starting_Then_return_thread_id")
     CHECK(id != 0);
 }
 
-TEST_CASE("When_starting_twice_Then_return_same_thread_id")
+TEST_CASE("When starting twice Then return same thread id")
 {
     funcall::ThreadFunctionQueue queue;
 
@@ -20,7 +20,7 @@ TEST_CASE("When_starting_twice_Then_return_same_thread_id")
     CHECK(id1 == id2);
 }
 
-TEST_CASE("When_stopping_Then_return_true")
+TEST_CASE("When stopping Then return true")
 {
     funcall::ThreadFunctionQueue queue;
     queue.start();
@@ -29,7 +29,7 @@ TEST_CASE("When_stopping_Then_return_true")
     CHECK(stopped);
 }
 
-TEST_CASE("When_stopping_twice_Then_return_true")
+TEST_CASE("When stopping twice Then return true")
 {
     funcall::ThreadFunctionQueue queue;
     queue.start();
@@ -40,7 +40,7 @@ TEST_CASE("When_stopping_twice_Then_return_true")
     CHECK(stopped2);
 }
 
-TEST_CASE("When_stopping_without_starting_Then_return_true")
+TEST_CASE("When stopping without starting Then return true")
 {
     funcall::ThreadFunctionQueue queue;
 
@@ -48,7 +48,7 @@ TEST_CASE("When_stopping_without_starting_Then_return_true")
     CHECK(stopped);
 }
 
-TEST_CASE("When_adding_a_function_in_the_queue_Then_the_function_is_called")
+TEST_CASE("When adding a function in the queue Then the function is called")
 {
     std::atomic_bool called = false;
     funcall::ThreadFunctionQueue queue;
@@ -60,7 +60,7 @@ TEST_CASE("When_adding_a_function_in_the_queue_Then_the_function_is_called")
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
 }
 
-TEST_CASE("When_adding_a_function_in_the_queue_withou_starting_Then_the_function_is_not_called")
+TEST_CASE("When adding a function in the queue withou starting Then the function is not called")
 {
     std::atomic_bool called = false;
     funcall::ThreadFunctionQueue queue;
@@ -71,7 +71,7 @@ TEST_CASE("When_adding_a_function_in_the_queue_withou_starting_Then_the_function
     CHECK_FALSE(called);
 }
 
-TEST_CASE("When_adding_a_function_after_stopping_Then_the_function_is_not_called")
+TEST_CASE("When adding a function after stopping Then the function is not called")
 {
     std::atomic_bool called = false;
     funcall::ThreadFunctionQueue queue;
