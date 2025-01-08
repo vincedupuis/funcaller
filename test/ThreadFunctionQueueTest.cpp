@@ -2,7 +2,7 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <doctest/doctest.h>
 
-TEST_CASE("When starting Then return thread id")
+TEST_CASE("When starting, Then return thread id")
 {
     funcall::ThreadFunctionQueue queue;
 
@@ -20,7 +20,7 @@ TEST_CASE("When starting twice Then return same thread id")
     CHECK(id1 == id2);
 }
 
-TEST_CASE("When stopping Then return true")
+TEST_CASE("When stopping, Then return true")
 {
     funcall::ThreadFunctionQueue queue;
     queue.start();
@@ -29,7 +29,7 @@ TEST_CASE("When stopping Then return true")
     CHECK(stopped);
 }
 
-TEST_CASE("When stopping twice Then return true")
+TEST_CASE("When stopping twice, Then return true")
 {
     funcall::ThreadFunctionQueue queue;
     queue.start();
@@ -40,7 +40,7 @@ TEST_CASE("When stopping twice Then return true")
     CHECK(stopped2);
 }
 
-TEST_CASE("When stopping without starting Then return true")
+TEST_CASE("When stopping without starting, Then return true")
 {
     funcall::ThreadFunctionQueue queue;
 
@@ -48,7 +48,7 @@ TEST_CASE("When stopping without starting Then return true")
     CHECK(stopped);
 }
 
-TEST_CASE("When adding a function in the queue Then the function is called")
+TEST_CASE("When adding a function in the queue, Then the function is called")
 {
     std::atomic_bool called = false;
     funcall::ThreadFunctionQueue queue;
@@ -60,7 +60,7 @@ TEST_CASE("When adding a function in the queue Then the function is called")
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
 }
 
-TEST_CASE("When adding a function in the queue withou starting Then the function is not called")
+TEST_CASE("When adding a function in the queue withou starting, Then the function is not called")
 {
     std::atomic_bool called = false;
     funcall::ThreadFunctionQueue queue;
@@ -71,7 +71,7 @@ TEST_CASE("When adding a function in the queue withou starting Then the function
     CHECK_FALSE(called);
 }
 
-TEST_CASE("When adding a function after stopping Then the function is not called")
+TEST_CASE("When adding a function after stopping, Then the function is not called")
 {
     std::atomic_bool called = false;
     funcall::ThreadFunctionQueue queue;
