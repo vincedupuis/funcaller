@@ -1,5 +1,6 @@
 #include "ThreadFunctionQueue.h"
 #include <sstream>
+#include <tstd/testpoint.h>
 
 using namespace funcall;
 
@@ -25,7 +26,7 @@ long ThreadFunctionQueue::start() noexcept
         return toLong(ctx->thread.get_id());
 
     ctx = std::make_shared<ThreadContext>();
-    ctx->thread = std::thread(&ThreadFunctionQueue::processQueue, ctx, mLogger);
+    ctx->thread = tp(std::thread(&ThreadFunctionQueue::processQueue, ctx, mLogger));
 
     waitFor(ctx->running, true);
     if (ctx->running) {
@@ -63,7 +64,7 @@ bool ThreadFunctionQueue::stop() noexcept
     ctx->condition.notify_one();
 
     waitFor(ctx->running, false);
-    if (!ctx->running) {
+    if (tp(!ctx->running)) {
         ctx->thread.join();
         mContext.store(nullptr);
         return true;
@@ -101,7 +102,7 @@ void ThreadFunctionQueue::add(Function &&function) noexcept
 
 void ThreadFunctionQueue::waitFor(const std::atomic<bool> &var, const bool value) noexcept
 {
-    const auto start = std::chrono::system_clock::now();
+    const auto start = tp(std::chrono::system_clock::now());
     while (var != value) {
         if (std::chrono::system_clock::now() - start > std::chrono::seconds(5))
             break;

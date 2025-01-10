@@ -12,8 +12,7 @@ add_executable(funcall-test
         src/ThreadContext.h
         test/ThreadFunctionQueueTest.cpp
 )
-
-target_compile_definitions(funcall-test PRIVATE UNIT_TESTING)
+target_compile_definitions(funcall-test PRIVATE TSTD_UNIT_TESTING)
 target_include_directories(funcall-test PRIVATE src external)
 
 add_executable(funcall-example
